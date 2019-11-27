@@ -1,7 +1,6 @@
 let pomodoro = {
     started : false,
-    isWorkTimerRunning : false,
-    isBreakTimerRunning : false,
+    isTimerRunning : false,
     minutes : 0,
     seconds : 0,
     interval: null,
@@ -43,17 +42,15 @@ let pomodoro = {
         this.started = started;
     },
     startWork : function() {
-      this.isBreakTimerRunning = false;
-      this.isWorkTimerRunning = true;
-      this.resetVariables(1, 0, true);
+      this.isTimerRunning = true;
+      this.resetVariables(25, 0, true);
     },
     startBreak : function() {
-      this.isWorkTimerRunning = false;
-      this.isBreakTimerRunning = true;
+      this.isTimerRunning = true;
       this.resetVariables(5, 0, true);
     },
     resetTimer : function() {
-        (this.isWorkTimerRunning == true) ? this.resetVariables(25, 0, false): this.resetVariables(5, 0, false);
+        (this.isTimerRunning == true) ? this.resetVariables(25, 0, false): this.resetVariables(5, 0, false);
         this.updateDom();
     },
     pauseTimer : function() {
@@ -71,20 +68,22 @@ let pomodoro = {
     },
     intervalCallback : function() {
         if(!this.started) return false;
-        if(this.isWorkTimerRunning || this.isBreakTimerRunning) {
-            if(this.seconds == 0) {
-                if(this.minutes == 0) {
-                    document.querySelector('#break').style.display = "inline";
-                    document.querySelector('#work').style.display = "none";
-                    this.timerComplete();
-                    return;
-                }
-                this.seconds = 59;
-                this.minutes--;
-            } else {
-                this.seconds--;
-            }
-            this.updateDom();
+        if(this.isTimerRunning) {
+          if(this.seconds == 0) {
+              if(this.minutes == 0) {
+                let pdBreak =document.querySelector('#break');
+                pdBreak.style.display = (pdBreak.style.display == "inline") ?"none" : "inline";
+                let pdWork = document.querySelector('#work');
+                pdWork.style.display = (pdWork.style.display == "none") ? "inline" : "none";
+                this.timerComplete();
+                return;                  
+              }
+              this.seconds = 59;
+              this.minutes--;
+          } else {
+              this.seconds--;
+          }
+          this.updateDom();
         }
     },
     timerComplete : function() {
